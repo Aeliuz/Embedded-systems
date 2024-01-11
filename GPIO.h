@@ -1,0 +1,51 @@
+
+#ifndef GPIO_H_
+#define GPIO_H_
+
+/* Inkluderingsdirektiv: */
+#include "definitions.h"
+
+/******************************************************************************
+* Strukten Led används för implementering av lysdioder, som kan placeras på
+* någon av digitala PINs 0 - 13 på Arduino Uno. Varje lysdiod kan tändas, 
+* släckas och togglas.
+******************************************************************************/
+typedef struct Led
+{
+	unsigned char PIN; /* Aktuellt PIN-nummer. */
+	bool enabled; /* Indikerar ifall lysdioden är på eller inte. */
+	IO_port io_port; /* I/O-port som lysdioden är ansluten till. */
+} Led;
+
+/******************************************************************************
+* Strukten Button används för implementering av tryckknappar, som kan placeras 
+* på någon av digitala PINs 0 - 13 på Arduino Uno. Det finns möjlighet att
+* enkelt läsa av ifall tryckknappen är nedtryckt. Det finns också möjlighet 
+* att aktivera samt inaktivera PCI-avbrott på tryckknappens PIN.
+* 
+* Avbrottsvektorer gällande PCI-avbrott för respektive I/O-port är följande:
+*
+* I/O-port B (PIN 8 - 13): PCINT0_vect
+* I/O-port C (PIN A0 - A5): PCINT1_vect - används dock inte för tryckknappar.
+* I/O-port D (PIN 0 - 7): PCINT2_vect
+******************************************************************************/
+typedef struct Button
+{
+	unsigned char PIN; /* Aktuellt PIN-nummer. */
+	IO_port io_port; /* Använd I/O-port. */
+	bool interrupt_enabled; /* Indikerar ifall PCI-avbrott är aktiverat. */
+} Button;
+
+/* Funktionsdeklarationer: */
+struct Led new_Led(const uint8_t PIN); 
+void Led_on(struct Led* self);
+void Led_off(struct Led* self);
+void Led_toggle(struct Led* self);
+void Led_blink(struct Led* self, const uint16_t delay_time);
+Button new_Button(const uint8_t PIN); 
+bool Button_is_pressed(struct Button* self);
+void Button_enable_interrupt(struct Button* self);
+void Button_disable_interrupt(struct Button* self);
+void delay(const uint16_t delay_time);
+
+#endif /* GPIO_H_ */
